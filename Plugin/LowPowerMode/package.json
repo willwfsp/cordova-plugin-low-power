@@ -1,6 +1,6 @@
 {
   "name": "cordova-plugin-low-power-mode",
-  "version": "0.0.5",
+  "version": "0.0.7",
   "description": "Detects and Notify if batery state is in Low Power Mode.",
   "cordova": {
     "id": "cordova-plugin-low-power-mode",
