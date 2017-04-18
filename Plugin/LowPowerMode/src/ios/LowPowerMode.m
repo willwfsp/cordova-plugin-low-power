@@ -19,6 +19,9 @@
 
 - (void)addObserverForLowPowerModeDidChangeNotification: (CDVInvokedUrlCommand*)command {
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(bateryStateDidChange) name:NSProcessInfoPowerStateDidChangeNotification object:command];
+    CDVPluginResult* pluginResult = nil;
+    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:NO];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
 - (void)bateryStateDidChange:(CDVInvokedUrlCommand*)command {
