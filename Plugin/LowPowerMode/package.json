@@ -1,0 +1,17 @@
+{
+  "name": "low-power-mode",
+  "version": "0.0.1",
+  "description": "Detects and Notify if batery state is in Low Power Mode.",
+  "cordova": {
+    "id": "cordova-plugin-low-power-mode",
+    "platforms": [
+      "ios"
+    ]
+  },
+  "keywords": [
+    "ecosystem:cordova",
+    "cordova-ios"
+  ],
+  "author": "Willian Policiano (willwfsp)",
+  "license": "ISC"
+}

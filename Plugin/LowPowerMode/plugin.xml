@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='utf-8'?>
+<plugin id="cordova-plugin-low-power-mode" version="0.0.1" xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
+  <name>LowPowerMode</name>
+  <js-module name="LowPowerMode" src="www/LowPowerMode.js">
+    <clobbers target="cordova.plugins.LowPowerMode" />
+  </js-module>
+
+  <platform name="ios">
+    <config-file parent="/*" target="config.xml">
+      <feature name="LowPowerMode">
+        <param name="ios-package" value="LowPowerMode" />
+      </feature>
+    </config-file>
+    <source-file src="src/ios/LowPowerMode.m" />
+  </platform>
+</plugin>
