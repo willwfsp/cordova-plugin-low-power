@@ -50,7 +50,7 @@ Nosso plugin apenas verifica o estado atual da bateria, que no exemplo nativo po
 ProcessInfo.processInfo.isLowPowerModeEnabled
 ```
 
-## 2.1 Criando um plugin utilizando o plugman
+## 2.1. Criando um plugin utilizando o plugman
 
 Para a criação do plugin foi utilizado como auxílio o [Plugman](https://github.com/apache/cordova-plugman). 
 Existe um [tutorial](https://taco.visualstudio.com/en-us/docs/createplugintutorial/) no qual este passo-a-passo foi baseado.
@@ -115,6 +115,171 @@ E foi adicionado o seguinte trecho de código no arquivo `plugin.xml`:
 
 ...
 ```
+
+## 2.2. Implementando o lado nativo do plugin
+
+O Plugman adiciona automaticamente uma classe nativa `.m` no diretório do plugin. O código gerado estará em Objective-C. 
+
+Entre no arquivo `src/ios/LowPowerMode.m` e o código Objective-C gerado é o seguinte:
+
+```objC
+/********* LowPowerMode.m Cordova Plugin Implementation *******/
+
+#import <Cordova/CDV.h>
+
+@interface LowPowerMode : CDVPlugin {
+  // Member variables go here.
+}
+
+- (void)coolMethod:(CDVInvokedUrlCommand*)command;
+@end
+
+@implementation LowPowerMode
+
+- (void)coolMethod:(CDVInvokedUrlCommand*)command
+{
+    CDVPluginResult* pluginResult = nil;
+    NSString* echo = [command.arguments objectAtIndex:0];
+
+    if (echo != nil && [echo length] > 0) {
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:echo];
+    } else {
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
+    }
+
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
+@end
+``` 
+
+1. Remova o `coolMethod` da `@interface` e da `@implementation`:
+
+```objC
+/********* LowPowerMode.m Cordova Plugin Implementation *******/
+
+#import <Cordova/CDV.h>
+
+@interface LowPowerMode : CDVPlugin {
+  // Member variables go here.
+}
+
+@end
+
+@implementation LowPowerMode
+
+@end
+```
+
+2. Adicione no `@interface` e na `@implementation` o método para verificação da bateria:
+
+```objC
+/********* LowPowerMode.m Cordova Plugin Implementation *******/
+
+#import <Cordova/CDV.h>
+#import <UIKit/UIKit.h>
+
+@interface LowPowerMode : CDVPlugin {
+  // Member variables go here.
+}
+
+- (void)isLowPowerModeEnabled:(CDVInvokedUrlCommand*)command;
+@end
+
+@implementation LowPowerMode
+
+- (void)isLowPowerModeEnabled:(CDVInvokedUrlCommand*)command
+{
+  NSLog(@"Batery State Changed");
+
+  CDVPluginResult* pluginResult = nil;
+
+  if (command == nil) {
+      // Failure
+      pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
+  } else {
+      bool isLowPowerModeEnabled = [[NSProcessInfo processInfo] isLowPowerModeEnabled];
+      // Success
+      pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:isLowPowerModeEnabled];
+  }
+
+  [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
+@end
+```
+
+## 2.3. Implementando o lado javascript do plugin
+
+Haverá também uma ponte Javascript entre o código nativo e nossa aplicação. Entre no arquivo `www/LowPowerMode.js` e você terá o seguinte código auto-gerado:
+
+```javascript
+var exec = require('cordova/exec');
+
+exports.coolMethod = function(arg0, success, error) {
+    exec(success, error, "LowPowerMode", "coolMethod", [arg0]);
+};
+
+```
+
+1. Substitua o `coolMethod` pelo `isLowPowerModeEnabled` para que o arquivo `.js` esteja da seguinte maneira:
+
+```javascript
+var exec = require('cordova/exec');
+
+exports.isLowPowerModeEnabled = function(callback) {
+  exec(function(successResult) {
+    callback(successResult);
+  }, function(error) {
+    callback(nil, {message: "Device is not ready. Try again later."});
+  }, "LowPowerMode", "isLowPowerModeEnabled", [""]);
+};
+
+```
+
+Feito isso a programação está pronta.
+
+## 2.3. Publicando o plugin
+
+Para publicar precisamos criar um arquivo `package.json`. Para isto use o seguinte comando do Plugman:
+
+``` 
+plugman createpackagejson .
+```
+
+Siga as instruções do terminal e finalize a criação do arquivo.
+
+Abra o arquivo `package.json` e edite seu o nome do pacote para `cordova-plugin-low-power-mode`.
+
+Seu arquivo se parecerá com este:
+
+```xml
+{
+  "name": "cordova-plugin-low-power-mode",
+  "version": "0.0.1",
+  "description": "Detects if batery state is in Low Power Mode.",
+  "cordova": {
+    "id": "cordova-plugin-low-power-mode",
+    "platforms": [
+      "ios"
+    ]
+  },
+  "keywords": [
+    "ecosystem:cordova",
+    "cordova-ios"
+  ],
+  "author": "Willian Policiano (willwfsp)",
+  "license": "ISC"
+}
+```
+
+Salve e execute o seguinte comando no terminal:
+
+```
+npm publish
+```
+
+Siga as instruções dadas no terminal e o plugin estará disponivel no [npmjs.com](npmjs.com).
 
 
 
