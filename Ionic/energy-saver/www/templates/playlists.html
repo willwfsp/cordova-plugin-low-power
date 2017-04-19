@@ -5,13 +5,17 @@
       <div class="item item-toggle">
          Low Power Mode
          <label class="toggle toggle-assertive">
-           <input type="checkbox">
+           <input type="checkbox" ng-checked="checked" ng-disabled="true">
            <div class="track">
              <div class="handle"></div>
            </div>
          </label>
       </div>
+      <div class="item">
+        <button class="button button-block button-positive" ng-click="updateState()">
+          Atualizar
+        </button>
+      </div>
     </div>
-    {{log}}
   </ion-content>
 </ion-view>

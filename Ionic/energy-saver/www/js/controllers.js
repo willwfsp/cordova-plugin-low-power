@@ -43,12 +43,19 @@ angular.module('starter.controllers', [])
 
 .controller('PlaylistsCtrl', function($scope, $ionicPlatform) {
   $ionicPlatform.ready(function() {
+    $scope.checked = false;
     $scope.log = "ionicPlatform"
-    if (window.cordova && window.cordova.plugins.LowPowerMode) {
-      $scope.log = "Funciona " + cordova.plugins.LowPowerMode.isLowPowerModeEnabled();
-    }
-  });
+    $scope.updateState = function() {
+      if (window.cordova && window.cordova.plugins.LowPowerMode) {
+        $scope.log = "LowPowerMode"
+        cordova.plugins.LowPowerMode.isLowPowerModeEnabled(function(result) {
+          $scope.checked = result;
+        });
+      }
+    };
 
+    $scope.updateState();
+  });
 })
 
 .controller('PlaylistCtrl', function($scope, $stateParams) {
