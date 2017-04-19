@@ -14,31 +14,20 @@
 
 - (void)isLowPowerModeEnabled:(CDVInvokedUrlCommand*)command
 {
-    [self addObserverForLowPowerModeDidChangeNotification: command];
-}
+  NSLog(@"Batery State Changed");
 
-- (void)addObserverForLowPowerModeDidChangeNotification: (CDVInvokedUrlCommand*)command {
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(bateryStateDidChange) name:NSProcessInfoPowerStateDidChangeNotification object:command];
-    CDVPluginResult* pluginResult = nil;
-    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:NO];
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-}
+  CDVPluginResult* pluginResult = nil;
 
-- (void)bateryStateDidChange:(CDVInvokedUrlCommand*)command {
-    NSLog(@"Batery State Changed");
+  if (command == nil) {
+      // Failure
+      pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
+  } else {
+      bool isLowPowerModeEnabled = [[NSProcessInfo processInfo] isLowPowerModeEnabled];
+      // Success
+      pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:isLowPowerModeEnabled];
+  }
 
-    CDVPluginResult* pluginResult = nil;
-
-    if (command == nil) {
-        // Failure
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
-    } else {
-        bool isLowPowerModeEnabled = [[NSProcessInfo processInfo] isLowPowerModeEnabled];
-        // Success
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:isLowPowerModeEnabled];
-    }
-
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+  [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
 @end
