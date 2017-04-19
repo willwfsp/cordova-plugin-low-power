@@ -253,7 +253,7 @@ Abra o arquivo `package.json` e edite seu o nome do pacote para `cordova-plugin-
 
 Seu arquivo se parecerá com este:
 
-```xml
+```json
 {
   "name": "cordova-plugin-low-power-mode",
   "version": "0.0.1",
