@@ -282,4 +282,87 @@ npm publish
 Siga as instruções dadas no terminal e o plugin estará disponivel no [npmjs.com](npmjs.com).
 
 
+# 3. Integrando o plugin com o Ionic
+
+A integração de plugins com Ionic pode ser um pouco complicada se o plugin não estiver 100% testado, pois é dificil depurar. Siga as instruções a seguir para integrar nosso plugin com sua aplicação.
+
+## 3.1 Configurações iniciais
+Para utilizar plugins cordova em aplicações Angularjs de qualquer natureza devemos utilizar o [ngCordova](http://ngcordova.com/).
+
+1. Entre no diretório do aplicativo ionic e execute o seguinte comando:
+
+```
+sudo npm install -g ng-cordova --save
+```
+
+2. No arquivo `index.js` insira a dependência `ngCordova.js` antes da `cordova.js`:
+
+```html
+<!-- cordova script (this will be a 404 during development) -->
+<script src="lib/ngCordova/dist/ng-cordova.js"></script>
+<script src="cordova.js"></script>
+```
+
+3. No arquivo `app.js` injete a dependência `'ngCordova'` no app module:
+
+```javascript
+angular.module('starter', ['ionic', 'starter.controllers', 'ngCordova'])
+
+.run(function($ionicPlatform) {
+
+...
+``` 
+
+## 3.2. Utilizando o Plugin
+
+Chegando até aqui, a etapa de utilizar o plugin é a mais fácil.
+
+> Para este teste, utilizei o template **sidemenu** do ionic e testei o plugin no controller `'PlayListCtrl'`
+
+1. O controller `PlayListCtrl` se transformou no seguinte controller:
+
+```javascript
+.controller('PlaylistsCtrl', function($scope, $ionicPlatform) {
+  $ionicPlatform.ready(function() {
+    $scope.checked = false;
+    $scope.log = "ionicPlatform"
+    $scope.updateState = function() {
+      if (window.cordova && window.cordova.plugins.LowPowerMode) {
+        $scope.log = "LowPowerMode"
+        cordova.plugins.LowPowerMode.isLowPowerModeEnabled(function(result) {
+          $scope.checked = result;
+        });
+      }
+    };
+
+    $scope.updateState();
+  });
+})
+```
+
+2. O template para este controller foi implementado da seguinte forma (`playlists.html`):
+
+```html
+<ion-view view-title="Playlists">
+  <ion-content has-header="true" padding="false">
+    <div class="list">
+      <div class="item item-toggle">
+         Low Power Mode
+         <label class="toggle toggle-assertive">
+           <input type="checkbox" ng-checked="checked" ng-disabled="true">
+           <div class="track">
+             <div class="handle"></div>
+           </div>
+         </label>
+      </div>
+      <div class="item">
+        <button class="button button-block button-positive" ng-click="updateState()">
+          Atualizar
+        </button>
+      </div>
+    </div>
+  </ion-content>
+</ion-view>
+
+```
 
