@@ -41,21 +41,27 @@ angular.module('starter.controllers', [])
   };
 })
 
-.controller('PlaylistsCtrl', function($scope, $ionicPlatform) {
-  $ionicPlatform.ready(function() {
-    $scope.checked = false;
-    $scope.log = "ionicPlatform"
+.controller('PlaylistsCtrl', function($scope, $ionicPlatform, BateryStatus) {
+  
+    
+
     $scope.updateState = function() {
-      if (window.cordova && window.cordova.plugins.LowPowerMode) {
-        $scope.log = "LowPowerMode"
-        cordova.plugins.LowPowerMode.isLowPowerModeEnabled(function(result) {
-          $scope.checked = result;
-        });
-      }
+      BateryStatus.status(function(result) {
+        $scope.checked = result.isLowPowerModeEnabled;
+        $scope.$apply();
+        console.log('[PlaylistsCtrl]\t $scope.checked has changed');
+      })
     };
 
-    $scope.updateState();
-  });
+    $ionicPlatform.ready(function() {
+      $scope.checked = false;
+      $ionicPlatform.on('resume', function() {
+        console.log('[PlaylistsCtrl]\t onResume');
+        $scope.updateState();
+      });
+    });
+    
+    
 })
 
 .controller('PlaylistCtrl', function($scope, $stateParams) {
