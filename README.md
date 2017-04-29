@@ -322,22 +322,25 @@ Chegando até aqui, a etapa de utilizar o plugin é a mais fácil.
 1. O controller `PlayListCtrl` se transformou no seguinte controller:
 
 ```javascript
-.controller('PlaylistsCtrl', function($scope, $ionicPlatform) {
-  $ionicPlatform.ready(function() {
-    $scope.checked = false;
-    $scope.log = "ionicPlatform"
-    $scope.updateState = function() {
-      if (window.cordova && window.cordova.plugins.LowPowerMode) {
-        $scope.log = "LowPowerMode"
-        cordova.plugins.LowPowerMode.isLowPowerModeEnabled(function(result) {
-          $scope.checked = result;
-        });
-      }
+  .controller('PlaylistsCtrl', function ($scope, $ionicPlatform, BatteryStatus) {
+
+    $scope.updateState = function () {
+      BatteryStatus.status(function (result) {
+        $scope.checked = result.isLowPowerModeEnabled;
+        $scope.$apply();
+        console.log('[PlaylistsCtrl]\t $scope.checked has changed');
+      })
     };
 
-    $scope.updateState();
-  });
-})
+    $ionicPlatform.ready(function() {
+      $scope.checked = false;
+      $ionicPlatform.on('resume', function() {
+        console.log('[PlaylistsCtrl]\t onResume');
+        $scope.updateState();
+      });
+    });
+    
+  })
 ```
 
 2. O template para este controller foi implementado da seguinte forma (`playlists.html`):
